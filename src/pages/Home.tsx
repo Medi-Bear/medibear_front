@@ -1,27 +1,46 @@
-import React, { useState, useEffect } from "react";
-import axios from "../config/setAxios";
-const Home = () => {
-	const [testWord, setTestWord] = useState<string | undefined>('');
-	
-	useEffect(() => {
-		axios.get("/fastapi/test")
-		.then(response => {
-			setTestWord(response.data); // "test data" 값을 상태에 저장
-		})
-		.catch(error => {
-			console.error("API 호출 실패:", error);
-		});
-	}, []);
-	console.log("API BASE URL:", import.meta.env.VITE_CORS_ALLOWED_ORIGINS);
-console.log("ENV data:", import.meta.env);
+import React, { useState } from "react";
+import { useSelector, useDispatch } from "react-redux";
+import { increment, decrement } from "../redux/slice/counterSlice";
+import type { AppDispatch, RootState } from "../redux/store";
 
+
+const Home = () => {
+	// const [testWord, setTestWord] = useState<string | undefined>('');
+	const count = useSelector((state: RootState) => state.counter.value);
+	const dispatch = useDispatch<AppDispatch>();
 
 	return (
-		<div>
+		<div className="p-6">
 			<p>하이</p>
-			<p>응답 : {testWord}</p>
+
+			<h1 className="text-3xl font-bold underline mb-6">
+				Tailwind CSS 테스트
+			</h1>
+			
+			<div style={{ textAlign: 'center', marginTop: '50px' }}>
+				<h1>Redux Persist Example</h1>
+				<h2>{count}</h2>
+				<button 
+					onClick={() => dispatch(increment())}
+					className="btn btn-primary mx-2"
+				>
+					+1
+				</button>
+				<button 
+					onClick={() => dispatch(decrement())}
+					className="btn btn-secondary mx-2"
+				>
+					-1
+				</button>
+			</div>
+
+			<div className="bg-blue-300 text-white font-semibold mt-10 p-6 rounded-xl w-full max-w-[1200px] mx-auto">
+				화면 너비를 벗어나지 않는 가로 박스
+			</div>
+
+
 		</div>
-	)
-}
+	);
+};
 
 export default Home;
