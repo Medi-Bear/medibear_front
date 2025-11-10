@@ -1,8 +1,6 @@
 import Router from './config/Router';
 
 function App() {
-
-
   return (
     <Router/>    
   )
