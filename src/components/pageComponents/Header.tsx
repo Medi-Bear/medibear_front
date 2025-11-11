@@ -86,7 +86,7 @@ const Header = ({ children }: HeaderProps) => {
               <button
                 className="is-drawer-close:tooltip is-drawer-close:tooltip-right"
                 data-tip="스트레스 관리"
-                onClick={() => navigate("/calorie")}
+                onClick={() => navigate("/stress")}
               >
                 <ClipboardList
                   className="inline-block size-4 my-1.5"
