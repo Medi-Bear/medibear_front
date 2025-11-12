@@ -1,6 +1,8 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import axios from "../../config/setAxios";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface FormModalProps {
   isOpen: boolean;
@@ -27,9 +29,7 @@ export default function FormModal({ isOpen, onClose }: FormModalProps) {
 
   // 배경 클릭 닫기
   const handleOutsideClick = (e: React.MouseEvent) => {
-    if (modalRef.current && !modalRef.current.contains(e.target as Node)) {
-      onClose();
-    }
+    if (modalRef.current && !modalRef.current.contains(e.target as Node)) onClose();
   };
 
   if (!isOpen) return null;
@@ -39,7 +39,7 @@ export default function FormModal({ isOpen, onClose }: FormModalProps) {
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // POST + 예측 API + 새로고침
+  //활동 데이터 저장 + 피로도 예측
   const handleSubmit = async () => {
     try {
       const payload = {
@@ -52,22 +52,26 @@ export default function FormModal({ isOpen, onClose }: FormModalProps) {
 
       console.log("📤 활동 데이터 전송:", payload);
 
-      // 1️⃣ 활동 데이터 저장
+      // 활동 데이터 저장
       const res = await axios.post("/sleep/activities", payload, {
         headers: { "Content-Type": "application/json" },
       });
-      console.log("✅ 활동 데이터 저장 완료:", res.data);
+      console.log("활동 데이터 저장 완료:", res.data);
 
-      // 2️⃣ 피로도 예측 호출
-      console.log("📡 피로도 예측 요청...");
+      // 피로도 예측 호출
+      console.log("피로도 예측 요청...");
       const predict = await axios.post(
         `/sleep/activities/predict-fatigue`,
         null,
-        { params: { userId: 1 } }
+        { params: { userId: "user001" } }
       );
-      console.log("✅ 피로도 예측 결과:", predict.data);
+      console.log("피로도 예측 결과:", predict.data);
 
-      alert("오늘의 활동 데이터가 저장되고 피로도 예측이 완료되었습니다!");
+      toast.success("오늘의 활동 데이터가 저장되고 피로도 예측이 완료되었습니다!", {
+        position: "top-center",
+        autoClose: 2200,
+        theme: "colored",
+      });
 
       // 입력 초기화
       setFormData({
@@ -79,126 +83,147 @@ export default function FormModal({ isOpen, onClose }: FormModalProps) {
 
       onClose();
 
-      // ✅ SleepAnalysis 페이지 전체 새로고침
+      // SleepAnalysis 새로고침
       setTimeout(() => {
         window.location.reload();
-      }, 300);
+      }, 500);
     } catch (err: any) {
-      console.error("❌ 에러 발생:", err);
+      console.error("에러 발생:", err);
       if (err.response?.status === 400) {
-        alert(err.response.data || "오늘은 이미 활동량이 등록되었습니다.");
+        toast.warning(err.response.data || "오늘은 이미 활동량이 등록되었습니다.", {
+          position: "top-center",
+          autoClose: 2000,
+          theme: "colored",
+        });
       } else {
-        alert("서버 오류가 발생했습니다.");
+        toast.error("서버 오류가 발생했습니다.", {
+          position: "top-center",
+          autoClose: 2000,
+          theme: "colored",
+        });
       }
     }
   };
 
   return (
-    <div
-      onClick={handleOutsideClick}
-      style={{
-        position: "fixed",
-        inset: 0,
-        background: "rgba(0, 0, 0, 0.4)",
-        display: "flex",
-        justifyContent: "center",
-        alignItems: "center",
-        zIndex: 50,
-      }}
-    >
+    <>
+      {/* ToastContainer는 모달 바깥에서도 표시 가능 */}
+      <ToastContainer />
+
       <div
-        ref={modalRef}
+        onClick={handleOutsideClick}
         style={{
-          background: "#FAF3E0",
-          borderRadius: 20,
-          boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
-          width: "420px",
-          padding: "32px",
-          position: "relative",
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0, 0, 0, 0.4)",
           display: "flex",
-          flexDirection: "column",
+          justifyContent: "center",
           alignItems: "center",
+          zIndex: 50,
         }}
       >
-        <button
-          onClick={onClose}
-          style={{
-            position: "absolute",
-            top: "10px",
-            right: "16px",
-            fontSize: "24px",
-            fontWeight: "bold",
-            color: "#B38252",
-            border: "none",
-            background: "transparent",
-            cursor: "pointer",
-          }}
-        >
-          ×
-        </button>
-
-        <h2
-          style={{
-            textAlign: "center",
-            fontSize: "20px",
-            fontWeight: 600,
-            color: "#B38252",
-            marginBottom: "24px",
-          }}
-        >
-          수면 및 활동 데이터 입력
-        </h2>
-
-        {/* 입력 필드 */}
         <div
+          ref={modalRef}
           style={{
+            background: "#FAF3E0",
+            borderRadius: 20,
+            boxShadow: "0 4px 16px rgba(0,0,0,0.2)",
+            width: "420px",
+            padding: "32px",
+            position: "relative",
             display: "flex",
             flexDirection: "column",
-            gap: "18px",
             alignItems: "center",
-            width: "100%",
-            maxWidth: "320px",
           }}
         >
-          <InputField label="수면시간 (시간)" name="sleepHours" value={formData.sleepHours} onChange={handleChange} />
-          <InputField label="카페인 섭취량 (mg)" name="caffeineMg" value={formData.caffeineMg} onChange={handleChange} />
-          <InputField label="알코올 섭취량 (잔)" name="alcoholConsumption" value={formData.alcoholConsumption} onChange={handleChange} />
-          <InputField label="활동량 (시간)" name="activityHours" value={formData.activityHours} onChange={handleChange} />
-        </div>
-
-        {/* 버튼 */}
-        <div style={{ display: "flex", justifyContent: "center", marginTop: "32px", gap: "12px", width: "100%" }}>
           <button
             onClick={onClose}
             style={{
-              padding: "10px 16px",
-              borderRadius: 12,
-              background: "#ccc",
-              color: "#333",
+              position: "absolute",
+              top: "10px",
+              right: "16px",
+              fontSize: "24px",
+              fontWeight: "bold",
+              color: "#B38252",
               border: "none",
-              fontWeight: 500,
+              background: "transparent",
               cursor: "pointer",
             }}
           >
-            취소
+            ×
           </button>
-          <button
-            onClick={handleSubmit}
+
+          <h2
             style={{
-              padding: "10px 16px",
-              borderRadius: 12,
-              background: "#D2B48C",
-              color: "#000",
+              textAlign: "center",
+              fontSize: "20px",
               fontWeight: 600,
-              border: "none",
-              cursor: "pointer",
+              color: "#B38252",
+              marginBottom: "24px",
             }}
           >
-            저장
-          </button>
+            수면 및 활동 데이터 입력
+          </h2>
+
+          {/* 입력 필드 */}
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              gap: "18px",
+              alignItems: "center",
+              width: "100%",
+              maxWidth: "320px",
+            }}
+          >
+            <InputField label="수면시간 (시간)" name="sleepHours" value={formData.sleepHours} onChange={handleChange} />
+            <InputField label="카페인 섭취량 (mg)" name="caffeineMg" value={formData.caffeineMg} onChange={handleChange} />
+            <InputField label="알코올 섭취량 (잔)" name="alcoholConsumption" value={formData.alcoholConsumption} onChange={handleChange} />
+            <InputField label="활동량 (시간)" name="activityHours" value={formData.activityHours} onChange={handleChange} />
+          </div>
+
+          {/* 버튼 */}
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "32px",
+              gap: "12px",
+              width: "100%",
+            }}
+          >
+            <button
+              onClick={onClose}
+              style={{
+                padding: "10px 16px",
+                borderRadius: 12,
+                background: "#ccc",
+                color: "#333",
+                border: "none",
+                fontWeight: 500,
+                cursor: "pointer",
+              }}
+            >
+              취소
+            </button>
+            <button
+              onClick={handleSubmit}
+              style={{
+                padding: "10px 16px",
+                borderRadius: 12,
+                background: "#D2B48C",
+                color: "#000",
+                fontWeight: 600,
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              저장
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
