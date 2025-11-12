@@ -13,7 +13,7 @@ const Home = () => {
 		});
 	}, []);
 	console.log("API BASE URL:", import.meta.env.VITE_CORS_ALLOWED_ORIGINS);
-console.log("ENV data:", import.meta.env);
+	console.log("ENV data:", import.meta.env);
 
 
 	return (
