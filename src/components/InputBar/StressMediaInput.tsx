@@ -1,4 +1,6 @@
+
 export function useStressMedia({ onSend }: { onSend: (data: any) => void }) {
+
     const toBase64 = (file: Blob) =>
       new Promise<string>((resolve) => {
         const reader = new FileReader();
@@ -48,7 +50,8 @@ export function useStressMedia({ onSend }: { onSend: (data: any) => void }) {
         </div>
       );
     };
-  
+
+
     return { render };
   }
   

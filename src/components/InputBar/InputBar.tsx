@@ -4,31 +4,58 @@ import { useExerciseMedia } from "../InputBar/ExerciseMediaInput";
 import { useStressMedia } from "../InputBar/StressMediaInput";
 import type { InputBarProps } from "../InputBar/types";
 
+type Mode = "text" | "image" | "video" | "webcam";
+
 export default function InputBar({ variant, onSend }: InputBarProps) {
-  const [mode, setMode] = useState("text");
+  const [mode, setMode] = useState<Mode>("text");
   const [text, setText] = useState("");
   const [selectedFileName, setSelectedFileName] = useState("");
+  const [sending, setSending] = useState(false);
 
-  // 공통 훅 연결
-  const exerciseMedia = useExerciseMedia({ onSend });
-  const stressMedia = useStressMedia({ onSend });
-
+  // auto-resize for textarea
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-
-  // 자동 높이 조절
   useEffect(() => {
-    const textarea = textareaRef.current;
-    if (textarea) {
-      textarea.style.height = "auto";
-      textarea.style.height = textarea.scrollHeight + "px";
-    }
+    const ta = textareaRef.current;
+    if (!ta) return;
+    ta.style.height = "auto";
+    ta.style.height = ta.scrollHeight + "px";
   }, [text]);
 
-  // 전송
-  const handleSend = () => {
-    if (!text.trim()) return;
-    onSend({ text });
-    setText("");
+  // media hooks (getPayload/clear를 제공한다고 가정)
+  const exerciseMedia = useExerciseMedia({ onSend });
+  const stressMedia   = useStressMedia({ onSend });
+
+  const handleSend = async () => {
+    const trimmed = text.trim();
+
+    // 텍스트 모드에서는 빈 문자열이면 전송하지 않음
+    if (!trimmed && mode === "text") return;
+
+    // 현재 variant에 맞게 미디어 payload 수집
+    const mediaPayload =
+      variant === "exercise"
+        ? (exerciseMedia.getPayload?.() ?? {})
+        : {};
+
+    // 미디어 모드 가드: 파일이 없으면 전송 막기
+    if ((mode === "image" || mode === "video") &&
+        !mediaPayload.base64Image && !mediaPayload.base64Video) {
+      alert("파일을 선택해주세요.");
+      return;
+    }
+
+    setSending(true);
+    try {
+      await onSend({ text: trimmed, ...mediaPayload }); // 텍스트 + 미디어 동시 전송
+      // 성공 시 입력/미디어 상태 초기화
+      setText("");
+      setSelectedFileName("");
+      if (variant === "exercise") exerciseMedia.clear?.();
+      // 필요하면 전송 후 텍스트 모드로 복귀:
+      // setMode("text");
+    } finally {
+      setSending(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
@@ -71,8 +98,11 @@ export default function InputBar({ variant, onSend }: InputBarProps) {
           <select
             value={mode}
             onChange={(e) => {
-              setMode(e.target.value);
+              const next = e.target.value as Mode;
+              setMode(next);
               setSelectedFileName("");
+              // 모드 변경 시 기존 미디어 초기화
+              if (variant === "exercise") exerciseMedia.clear?.();
             }}
             style={{
               padding: "8px 10px",
@@ -91,9 +121,7 @@ export default function InputBar({ variant, onSend }: InputBarProps) {
                 <option value="webcam">웹캠 녹화</option>
               </>
             )}
-            {variant === "stress" && (
-              <option value="audio">음성 업로드</option>
-            )}
+            {variant === "stress" && <option value="audio">음성 업로드</option>}
           </select>
         )}
 
@@ -137,21 +165,22 @@ export default function InputBar({ variant, onSend }: InputBarProps) {
       {/* 전송 버튼 */}
       <button
         onClick={handleSend}
+        disabled={sending}
         style={{
-          backgroundColor: "#D2B48C",
+          backgroundColor: sending ? "#c8b095" : "#D2B48C",
           fontWeight: 600,
           border: "none",
           outline: "none",
           width: "clamp(70px, 18vw, 90px)",
           height: "clamp(45px, 12vw, 55px)",
           borderRadius: 20,
-          cursor: "pointer",
+          cursor: sending ? "not-allowed" : "pointer",
           fontSize: "clamp(13px, 2vw, 15px)",
           alignSelf: "center",
           flexShrink: 0,
         }}
       >
-        전송
+        {sending ? "전송중..." : "전송"}
       </button>
     </div>
   );
