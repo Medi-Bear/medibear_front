@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
 import axios from "../../config/setAxios"
-import InputBar from "../../components/Input";
+import InputBar from "../../components/InputBar/InputBar";
 import ReportButtonGroup from "../../components/Sleep/ReportButton";
 import ChatMessageBubble from "../../components/ChatMessageBubble";
 
@@ -70,6 +70,7 @@ export default function SleepChatPage() {
         height: "100vh",
         background: "#FFFCF6",
         color: "#000",
+        overflow:"hidden",
       }}
     >
       {/* 채팅 영역 */}
@@ -79,7 +80,7 @@ export default function SleepChatPage() {
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          overflow: "hidden",
+          overflow: "hidden"
         }}
       >
         {/* 대화 내용 */}
@@ -120,6 +121,7 @@ export default function SleepChatPage() {
             padding: "0 0 20px",
             gap: "12px",
             boxSizing:"border-box",
+            flexShrink:0,
           }}
         >
           <ReportButtonGroup userId={userId} onReport={handleReport} />

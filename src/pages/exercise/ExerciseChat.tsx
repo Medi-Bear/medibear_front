@@ -1,6 +1,6 @@
 // import Sidebar from "../../components/Sidebar";
 import ChatMessageBubble from "../../components/ChatMessageBubble";
-import InputBar from "../../components/Input";
+import InputBar from "../../components/InputBar/InputBar";
 import { useState } from "react";
 import axios from "../../config/setAxios"
 export default function ExerciseChat() {
