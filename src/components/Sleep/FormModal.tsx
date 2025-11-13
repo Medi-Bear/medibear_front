@@ -43,7 +43,7 @@ export default function FormModal({ isOpen, onClose }: FormModalProps) {
   const handleSubmit = async () => {
     try {
       const payload = {
-        userId: "user001",
+        memberNo: 1,
         sleepHours: parseFloat(formData.sleepHours) || 0,
         caffeineMg: parseFloat(formData.caffeineMg) || 0,
         alcoholConsumption: parseFloat(formData.alcoholConsumption) || 0,
@@ -63,7 +63,7 @@ export default function FormModal({ isOpen, onClose }: FormModalProps) {
       const predict = await axios.post(
         `/sleep/activities/predict-fatigue`,
         null,
-        { params: { userId: "user001" } }
+        { params: { memberNo: 1 } }
       );
       console.log("피로도 예측 결과:", predict.data);
 

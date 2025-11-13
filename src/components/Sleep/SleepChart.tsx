@@ -10,7 +10,6 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
-//타입 정의 (SleepRecord는 수면 데이터 1개의 구조)
 interface SleepRecord {
   date: string;
   sleepHours: number;
@@ -18,20 +17,18 @@ interface SleepRecord {
 
 export default function SleepChart() {
   const [sleepData, setSleepData] = useState<SleepRecord[]>([]);
-  const userId = "user001"; // 나중에 로그인 유저 기반으로 바꿔도 됨
+  const memberNo = 1;
 
   useEffect(() => {
     const fetchSleepData = async () => {
       try {
-        const res = await axios.get(`/sleep/recent`, { params: { userId } });
+        const res = await axios.get(`/sleep/recent`, { params: { memberNo } });
 
-        // 데이터 포맷 맞추기
-        const formatted: SleepRecord[] = res.data
+        const formatted: SleepRecord[] = res.data.data
           .map((d: any) => ({
-            date: d.date?.slice(5), // "2025-11-10" → "11-10"
+            date: d.date?.slice(5),
             sleepHours: d.sleepHours ?? 0,
           }))
-          // 타입 명시된 정렬
           .sort(
             (a: SleepRecord, b: SleepRecord) =>
               new Date(a.date).getTime() - new Date(b.date).getTime()

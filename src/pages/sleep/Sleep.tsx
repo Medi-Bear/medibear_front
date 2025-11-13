@@ -12,7 +12,7 @@ interface Message {
 
 export default function SleepChatPage() {
   const [messages, setMessages] = useState<Message[]>([]);
-  const userId = "user001";
+  const memberNo = 1;
   const [loading, setLoading] = useState(false);
   const bottomRef = useRef<HTMLDivElement | null>(null); 
 
@@ -32,7 +32,7 @@ export default function SleepChatPage() {
 
     try {
       const res = await axios.post("/chat/message", {
-        user_id: userId,
+        memberNo: memberNo,
         message: userMessage,
       });
 
@@ -124,7 +124,7 @@ export default function SleepChatPage() {
             flexShrink:0,
           }}
         >
-          <ReportButtonGroup userId={userId} onReport={handleReport} />
+          <ReportButtonGroup memberNo={memberNo} onReport={handleReport} />
           <InputBar variant="sleep" onSend={handleSend} />
         </div>
       </main>
