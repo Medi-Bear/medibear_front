@@ -6,7 +6,7 @@ export default function SleepInsights() {
   const [sleepQuality, setSleepQuality] = useState<number | null>(null);
   const [conditionLevel, setConditionLevel] = useState<string>("");
   const [recommendedSleep, setRecommendedSleep] = useState<string>("예측 중...");
-  const userId = "user001";
+  const memberNo = 1;
 
   const conditionEmoji: Record<string, string> = {
     좋음: "😆",
@@ -18,26 +18,33 @@ export default function SleepInsights() {
   useEffect(() => {
     const fetchPredictions = async () => {
       try {
-        const fatigueRes = await axios.post(`/sleep/activities/predict-fatigue`, null, {
-          params: { userId },
+        // ✔ 피로도 예측 GET 요청
+        const fatigueRes = await axios.get(`/sleep/predict-fatigue`, {
+          params: { memberNo },
         });
-
-        setFatigueScore(fatigueRes.data?.predictedFatigueScore ?? null);
-        setConditionLevel(fatigueRes.data?.conditionLevel ?? "");
-        setSleepQuality(fatigueRes.data?.predicted_sleep_quality ?? null);
-
-        const sleepRes = await axios.post(`/sleep/activities/predict-sleephours`, null, {
-          params: { userId },
+  
+        const fatigueData = fatigueRes.data?.data;
+  
+        setFatigueScore(fatigueData?.predictedFatigueScore ?? null);
+        setConditionLevel(fatigueData?.conditionLevel ?? "");
+        setSleepQuality(fatigueData?.predictedSleepQuality ?? null);
+  
+        // ✔ 최적 수면시간 예측 GET 요청
+        const sleepRes = await axios.get(`/sleep/predict-sleephours`, {
+          params: { memberNo },
         });
-        setRecommendedSleep(sleepRes.data?.recommendedSleepRange || "데이터 없음");
+  
+        const sleepData = sleepRes.data?.data;
+        setRecommendedSleep(sleepData?.recommendedSleepRange ?? "데이터 없음");
+        
       } catch (err) {
         console.error("예측 불러오기 실패:", err);
-        setRecommendedSleep("예측 실패");
       }
     };
-
+  
     fetchPredictions();
   }, []);
+  
 
   const renderCondition = () => {
     if (!conditionLevel) return "-";

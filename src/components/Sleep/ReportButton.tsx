@@ -3,11 +3,11 @@ import { useState } from "react";
 import { getDailyReport, getWeeklyReport } from "../../services/SleepServices/ReportServices";
 
 type ReportButtonGroupProps = {
-  userId: string;
+  memberNo: number;
   onReport: (type: "daily" | "weekly", content: string) => void;
 };
 
-export default function ReportButtonGroup({ userId, onReport }: ReportButtonGroupProps) {
+export default function ReportButtonGroup({ memberNo, onReport }: ReportButtonGroupProps) {
   const [loading, setLoading] = useState<"daily" | "weekly" | null>(null);
 
   // 버튼 클릭 시 API 호출
@@ -17,8 +17,8 @@ export default function ReportButtonGroup({ userId, onReport }: ReportButtonGrou
 
       const response =
         type === "daily"
-          ? await getDailyReport(userId)
-          : await getWeeklyReport(userId);
+          ? await getDailyReport(memberNo)
+          : await getWeeklyReport(memberNo);
 
       const content =
         response?.report ||
