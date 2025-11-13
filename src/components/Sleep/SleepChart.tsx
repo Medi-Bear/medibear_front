@@ -9,6 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import {autoRefreshCheck} from "../../utils/TokenUtils";
 
 //타입 정의 (SleepRecord는 수면 데이터 1개의 구조)
 interface SleepRecord {
@@ -23,7 +24,15 @@ export default function SleepChart() {
   useEffect(() => {
     const fetchSleepData = async () => {
       try {
-        const res = await axios.get(`/sleep/recent`, { params: { userId } });
+        // const res = await axios.get(`/sleep/recent`, { params: { userId } });
+        //토큰 재발급요청용 
+   
+        const res = await autoRefreshCheck({
+          url: "/sleep/recent",
+          method: "GET",
+          params: { userId},
+          credentials: 'include',
+        });
 
         // 데이터 포맷 맞추기
         const formatted: SleepRecord[] = res.data
