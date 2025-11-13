@@ -30,7 +30,6 @@ export default function SleepChart() {
           url: "/sleep/recent",
           method: "GET",
           params: { memberNo},
-          credentials: 'include',
         });
 
         const formatted: SleepRecord[] = res.data.data

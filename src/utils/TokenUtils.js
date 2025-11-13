@@ -71,10 +71,11 @@ export async function autoRefreshCheck(config) {
                         })
                         .catch((refreshError) => {
                             localStorage.removeItem("accessToken");
-                            alert("세션이 만료되었습니다. 다시 로그인 해주세요.");
+                            alert("세션이 만료되었습니다. 다시 로그인 해주세요."); //
                             refreshSubscribers.forEach(callback => callback(null));
                             refreshSubscribers = [];
                             reject(refreshError);
+                            window.location.href = "/login";
                         })
                         .finally(() => {
                             isRefreshing = false;
