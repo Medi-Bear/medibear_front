@@ -46,6 +46,9 @@ export default function InputBar({ variant, onSend }: InputBarProps) {
     }
 
     setSending(true);
+
+    setText("");
+    
     try {
       // onSend 호출 : 부모 컴포넌트(ExerciseChat에 text, 미디어 전송)
       await onSend({ text: trimmed, ...mediaPayload }); 
