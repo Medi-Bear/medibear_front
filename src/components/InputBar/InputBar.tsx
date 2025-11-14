@@ -21,6 +21,7 @@ export default function InputBar({ variant, onSend }: InputBarProps) {
     ta.style.height = ta.scrollHeight + "px";
   }, [text]);
 
+  // media hooks (getPayload/clear를 제공한다고 가정)
   const exerciseMedia = useExerciseMedia({ onSend });
   const stressMedia   = useStressMedia({ onSend });
 
@@ -100,7 +101,6 @@ export default function InputBar({ variant, onSend }: InputBarProps) {
                 <option value="webcam">웹캠 녹화</option>
               </>
             )}
-
             {variant === "stress" && <option value="audio">음성 업로드</option>}
           </select>
         )}

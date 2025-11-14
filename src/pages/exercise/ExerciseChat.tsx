@@ -2,7 +2,8 @@
 import { useState } from "react";
 import ChatMessageBubble_exercise from "../../components/ChatMessageBubble_exercise";
 import InputBar from "../../components/InputBar/InputBar";
-import { jwtDecode } from "jwt-decode";
+import { getUserEmail } from "../../utils/getUserEmail";
+import {autoRefreshCheck} from "../../utils/TokenUtils";
 // 파일(Image/Video)을 base64(dataURL)로 변환하는 함수 : 현재 사용x 
 // const fileToBase64 = (file: File): Promise<string> =>
 //   new Promise((resolve, reject) => {
@@ -13,34 +14,34 @@ import { jwtDecode } from "jwt-decode";
 //   });
 
 // 서버 한 곳으로 통일 (FastAPI) 
-const API_URL = "http://localhost:5000/analyze";
+const API_URL = "http://localhost:8080/exercise/analyze";
 
 type SendArgs = { text?: string; base64Image?: string; base64Video?: string };
 // userId값 임의로 'user1' 이라고 넣었음 > 나중에 수정필요
 async function sendToServer({ text, base64Image, base64Video }: SendArgs) {
-  // userId 을 위해 토큰까는 부분
-  const token = localStorage.getItem("accessToken");
-  let tokenUserId = null;
-  let pureToken = null;
-  let decoded = null;
-  if (token) {
-    pureToken = token.replace("Bearer ", "");
-    decoded = jwtDecode(pureToken);
-    tokenUserId = decoded.memberId;
-  }
-
-  
-  const payload: any = { userId: tokenUserId, message: text ?? "" };
+  // email 을 위해 토큰까는 부분
+  const email = getUserEmail();
+  const payload: any = { userId: email, message: text ?? "" };
   if (base64Image) payload.image = base64Image;
   if (base64Video) payload.video = base64Video;
 
   
-  // 서버에 post 요청
-  const res = await fetch(API_URL, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
+  // // 서버에 post 요청
+  // const res = await fetch(API_URL, {
+  //   method: "POST",
+  //   headers: { "Content-Type": "application/json" },
+  //   body: JSON.stringify(payload),
+  // });
+
+  const res = await autoRefreshCheck({
+      url: API_URL,
+      method: "POST",
+      data: payload,           // fetch의 body
+      headers: {
+        "Content-Type": "application/json",
+      },
+      withCredentials: true,   // refresh token 쿠키 때문에 필요
+    });
 
   // 서버 응답 처리
   const body = await res.text();
