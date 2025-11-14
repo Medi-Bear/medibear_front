@@ -27,17 +27,22 @@ export default function Register() {
 
     // 약관 동의 체크
     if (!form.agree) {
-      toast.warning("개인정보 수집에 동의해주세요.");
+      toast.warning("개인정보 수집에 동의해주세요.", {
+        position: "top-center",
+        theme: "colored",
+      });
       return;
     }
 
     // 비밀번호 확인
     if (form.password !== form.passwordCheck) {
-      toast.error("비밀번호가 일치하지 않습니다.");
+      toast.error("비밀번호가 일치하지 않습니다.", {
+        position: "top-center",
+        theme: "colored",
+      });
       return;
     }
 
-    // 요청 데이터
     const payload = {
       name: form.name,
       email: form.email,
@@ -52,19 +57,37 @@ export default function Register() {
       });
 
       toast.success("회원가입이 완료되었습니다!", {
+        position: "top-center",
+        autoClose: 1500,
+        theme: "colored",
         onClose: () => {
-          window.location.href = "/login"; // 완료 후 로그인 페이지 이동
+          window.location.href = "/login";
         },
       });
     } catch (err: any) {
       console.error("회원가입 오류:", err);
 
-      const message =
-        err.response?.data?.message ||
-        err.response?.data ||
-        "회원가입 중 오류가 발생했습니다.";
+      let message = "회원가입 중 오류가 발생했습니다.";
 
-      toast.error(message);
+      // 백엔드 응답 파싱
+      if (err.response?.data) {
+        const data = err.response.data;
+
+        if (typeof data === "string") {
+          // 서버가 단순 문자열 반환
+          message = data;
+        } else if (typeof data === "object") {
+          // 서버가 JSON 반환
+          if (data.error) message = data.error;        // ⭐ AuthController 형태
+          else if (data.message) message = data.message;
+        }
+      }
+
+      toast.error(message, {
+        position: "top-center",
+        autoClose: 2000,
+        theme: "colored",
+      });
     }
   };
 
@@ -94,14 +117,12 @@ export default function Register() {
         fontFamily: "sans-serif",
       }}
     >
-      {/* ToastContainer 전역 위치 */}
       <ToastContainer position="top-center" autoClose={2000} theme="colored" />
 
       <h1 style={{ fontSize: "28px", fontWeight: 700, marginBottom: "40px" }}>
         MediBear
       </h1>
 
-      {/* Register Card */}
       <form
         onSubmit={handleSubmit}
         style={{
@@ -117,7 +138,7 @@ export default function Register() {
         }}
       >
         <h2 style={{ fontSize: "18px", fontWeight: 600, color: "#B38252" }}>
-          Sign Up
+          회원 가입
         </h2>
 
         {/* Name */}
@@ -153,7 +174,7 @@ export default function Register() {
               cursor: "pointer",
             }}
           >
-            Male
+            남성
           </button>
           <button
             type="button"
@@ -169,7 +190,7 @@ export default function Register() {
               cursor: "pointer",
             }}
           >
-            Female
+            여성
           </button>
         </div>
 
@@ -196,7 +217,7 @@ export default function Register() {
         <input
           type="password"
           name="password"
-          placeholder="Password"
+          placeholder="비밀번호"
           value={form.password}
           onChange={handleChange}
           style={baseInputStyle}
@@ -205,7 +226,7 @@ export default function Register() {
         <input
           type="password"
           name="passwordCheck"
-          placeholder="Confirm Password"
+          placeholder="비밀번호 확인"
           value={form.passwordCheck}
           onChange={handleChange}
           style={baseInputStyle}
@@ -228,7 +249,7 @@ export default function Register() {
             onChange={handleChange}
             style={{ width: "16px", height: "16px", accentColor: "#B38252" }}
           />
-          <label>I agree to the collection and use of personal information.</label>
+          <label>개인정보 수집 및 이용에 동의합니다.</label>
         </div>
 
         {/* Submit */}
@@ -247,7 +268,7 @@ export default function Register() {
             marginTop: "8px",
           }}
         >
-          Register
+          회원가입
         </button>
       </form>
     </div>
