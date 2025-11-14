@@ -2,7 +2,7 @@
 import { useState } from "react";
 import ChatMessageBubble_exercise from "../../components/ChatMessageBubble_exercise";
 import InputBar from "../../components/InputBar/InputBar";
-
+import { jwtDecode } from "jwt-decode";
 // 파일(Image/Video)을 base64(dataURL)로 변환하는 함수 : 현재 사용x 
 // const fileToBase64 = (file: File): Promise<string> =>
 //   new Promise((resolve, reject) => {
@@ -18,10 +18,23 @@ const API_URL = "http://localhost:5000/analyze";
 type SendArgs = { text?: string; base64Image?: string; base64Video?: string };
 // userId값 임의로 'user1' 이라고 넣었음 > 나중에 수정필요
 async function sendToServer({ text, base64Image, base64Video }: SendArgs) {
-  const payload: any = { userId: "user1", message: text ?? "" };
+  // userId 을 위해 토큰까는 부분
+  const token = localStorage.getItem("accessToken");
+  let tokenUserId = null;
+  let pureToken = null;
+  let decoded = null;
+  if (token) {
+    pureToken = token.replace("Bearer ", "");
+    decoded = jwtDecode(pureToken);
+    tokenUserId = decoded.memberId;
+  }
+
+  
+  const payload: any = { userId: tokenUserId, message: text ?? "" };
   if (base64Image) payload.image = base64Image;
   if (base64Video) payload.video = base64Video;
 
+  
   // 서버에 post 요청
   const res = await fetch(API_URL, {
     method: "POST",
