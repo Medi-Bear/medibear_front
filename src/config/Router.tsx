@@ -5,7 +5,7 @@ import MainLayout from "../layouts/MainLayout";
 import Calorie from "../pages/calorie/Calorie";
 import Mypage from "../pages/member/Mypage";
 import Login from "../pages/member/Login";
-import Register from "../pages/Register";
+import Register from "../pages/member/Register";
 import ExerciseChat from "../pages/exercise/ExerciseChat";
 import Sleep from "../pages/sleep/Sleep"
 import SleepPredict from "../pages/sleep/SleepPredict"
