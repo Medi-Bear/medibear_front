@@ -2,7 +2,7 @@
 import ChatMessageBubble from "../../components/ChatMessageBubble";
 import InputBar from "../../components/InputBar/InputBar";
 import { useState } from "react";
-import axios from "../../config/setAxios"
+// import axios from "../../config/setAxios"
 export default function ExerciseChat() {
   const [messages, setMessages] = useState<{ from: "user" | "ai"; text: string }[]>([]);
 

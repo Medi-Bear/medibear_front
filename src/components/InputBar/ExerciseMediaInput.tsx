@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 
 export function useExerciseMedia({ onSend }: { onSend: (data: any) => void }) {
-  const [recordedVideoBase64, setRecordedVideoBase64] = useState<string | null>(null);
+  const [_recordedVideoBase64, setRecordedVideoBase64] = useState<string | null>(null);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const recorderRef = useRef<MediaRecorder | null>(null);

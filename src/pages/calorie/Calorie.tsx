@@ -25,10 +25,13 @@ const Calorie = () => {
 	const requestPrediction = async (payload: CalorieForm) => {
 		try {
 			setIsLoading(true);
-			const response = await axios.post("api/ai/calorie/predict", payload);
-			const predicted = setPrediction(response.data?.predicted_calories ?? null);
-			console.log("칼로리 예측 결과:", response.data);
 
+			const response = await axios.post("/api/ai/calorie/predict", payload);
+			const predicted = response.data?.predicted_calories ?? null;
+
+			setPrediction(predicted);
+			console.log("칼로리 예측 결과:", response.data);
+			
 			if(predicted !== null) {
 				await requestAnalyze();
 			}
@@ -36,6 +39,7 @@ const Calorie = () => {
 		} catch (error) {
 			console.error("칼로리 예측 API 호출 실패:", error);
 			setPrediction(null);
+			setAnalysis(null);
 		} finally {
 			setIsLoading(false);
 		}
@@ -43,7 +47,7 @@ const Calorie = () => {
 
 	const requestAnalyze = async () => {
 		try {
-			const response = await axios.post("api/ai/calorie/analyze");
+			const response = await axios.post("/api/ai/calorie/analyze");
 			setAnalysis(response.data);
 			console.log("LLM 분석 결과:", response.data);
 		}catch (error){

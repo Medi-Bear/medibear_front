@@ -9,7 +9,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
-import {autoRefreshCheck} from "../../utils/TokenUtils.js";
+import {autoRefreshCheck} from "../../utils/TokenUtils";
 
 interface SleepRecord {
   date: string;
@@ -25,13 +25,17 @@ export default function SleepChart() {
       try {
         // const res = await axios.get(`/sleep/recent`, { params: { userId } });
         //토큰 재발급요청용 
-   
+
         const res = await autoRefreshCheck({
           url: "/sleep/recent",
           method: "GET",
           params: { memberNo},
-          credentials: 'include',
+          withCredentials: true
         });
+
+        if (!res) return;  // 또는 원하는 에러 처리
+
+        console.log(res.data);  // 👍 TS 오류 없음
 
         const formatted: SleepRecord[] = res.data.data
           .map((d: any) => ({

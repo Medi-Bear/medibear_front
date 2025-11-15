@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import axios from "../../config/setAxios";
+import { useState } from "react";
+// import axios from "../../config/setAxios";
 import {
   LineChart,
   Line,
@@ -28,14 +28,14 @@ type CalorieLog = {
 const MyPage = () => {
   const navigate = useNavigate();
 
-  const [profile, setProfile] = useState<UserProfile>({
+  const [profile] = useState<UserProfile>({
     name: "홍길동",
     height_cm: 170,
     weight_kg: 70,
     bmi: 23,
   });
 
-  const [logs, setLogs] = useState<CalorieLog[]>([
+  const [logs] = useState<CalorieLog[]>([
     { name: "11/07", activity_type: "Running", calories: 420, analysis: "지속적인 유산소로 체력 향상" },
     { name: "11/08", activity_type: "Cycling", calories: 510, analysis: "하체 강화에 효과적" },
     { name: "11/09", activity_type: "Yoga", calories: 480, analysis: "유연성과 안정성 향상" },
