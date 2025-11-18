@@ -6,6 +6,7 @@ import ReportButtonGroup from "../../components/Sleep/ReportButton";
 import ChatLayout from "../../layouts/ChatBotLayout";
 import ChatInputBar from "../../components/chat/ChatInputBar";
 import MessageList from "../../components/chat/MessageList";
+import sleepBear from "../../assets/sleepbear.png";
 interface Message {
   role: "user" | "assistant";
   content: string;
@@ -76,7 +77,7 @@ export default function SleepChatPage() {
 
   return (
     <ChatLayout>
-      <MessageList messages={messages} loading={loading} bottomRef={bottomRef} />
+      <MessageList messages={messages} loading={loading} bottomRef={bottomRef} logo={sleepBear} />
       <ReportButtonGroup email={email ?? ""} onReport={handleReport} />
       <ChatInputBar onSend={handleSend}/>
     </ChatLayout>

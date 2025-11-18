@@ -8,6 +8,7 @@ import type { MultiMessage } from "../../components/chat/MultiMessageList";
 import MultiChatInputBar from "../../components/chat/MultiChatInputBar";
 import { getUserEmail } from "../../utils/getUserEmail";
 import { autoRefreshCheck } from "../../utils/TokenUtils";
+import exerciseBear from "../../assets/medibear.png";
 
 const API_URL = "http://localhost:8080/exercise/analyze";
 
@@ -102,7 +103,7 @@ export default function ExerciseChatPage() {
 
   return (
     <MultiChatLayout>
-      <MultiMessageList messages={messages} loading={loading} bottomRef={bottomRef} />
+      <MultiMessageList messages={messages} loading={loading} bottomRef={bottomRef} logo={exerciseBear} />
       <MultiChatInputBar onSend={onSend} />
     </MultiChatLayout>
   );
