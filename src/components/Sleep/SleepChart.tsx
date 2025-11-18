@@ -1,14 +1,6 @@
 import { useEffect, useState } from "react";
-// import axios from "../../config/setAxios";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  ResponsiveContainer,
-} from "recharts";
+
+import {BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,} from "recharts";
 import {autoRefreshCheck} from "../../utils/TokenUtils";
 import { getUserEmail } from "../../utils/getUserEmail";
 
@@ -34,8 +26,12 @@ export default function SleepChart() {
           url: "/sleep/recent",
           method: "GET",
           params: {email},
-          credentials: 'include',
+          withCredentials: true,
         });
+
+        if (!res) return;  // 또는 원하는 에러 처리
+
+        console.log(res.data);  // 👍 TS 오류 없음
 
         const formatted: SleepRecord[] = res.data.data
           .map((d: any) => ({
