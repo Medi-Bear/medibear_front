@@ -4,26 +4,41 @@ import TypeIt from "typeit";
 interface Props {
   from: "user" | "ai";
   text: string;
-  isLast: boolean; // 마지막 assistant 메시지 여부
+  isLast: boolean;
+
+  // 🔥 추가
+  autoScroll: boolean;
+  scrollRef: React.RefObject<HTMLDivElement | null>;
 }
 
-export default function ChatMessageBubble({ from, text, isLast }: Props) {
+export default function ChatMessageBubble({ from, text, isLast, autoScroll, scrollRef }: Props) {
   const isUser = from === "user";
   const typeRef = useRef<HTMLDivElement>(null);
 
-  // TypeIt 애니메이션 (assistant + 마지막 메시지에서만 실행)
+  // TypeIt 애니메이션 + 자동 스크롤
   useEffect(() => {
     if (!isUser && isLast && typeRef.current) {
-      typeRef.current.innerHTML = ""; // 초기화 (중복 렌더 방지)
+      typeRef.current.innerHTML = "";
+
       new TypeIt(typeRef.current, {
         speed: 10,
         waitUntilVisible: true,
-		cursor: false,
+        cursor: false,
+
+        // 🔥 타이핑 한 글자마다 아래로
+        afterStep: () => {
+          if (autoScroll) {
+            scrollRef.current?.scrollIntoView({
+              behavior: "auto",
+              block: "end",
+            });
+          }
+        }
       })
         .type(text)
         .go();
     }
-  }, [isUser, isLast, text]);
+  }, [isUser, isLast, text, autoScroll]);
 
   return (
     <div
@@ -37,7 +52,6 @@ export default function ChatMessageBubble({ from, text, isLast }: Props) {
           ${isUser ? "bg-[#D2B48C]" : "bg-[#FAF3E0]"}
         `}
       >
-        {/* User → 즉시 출력 / Assistant → 마지막 메시지만 typing */}
         {isUser ? (
           text
         ) : isLast ? (
