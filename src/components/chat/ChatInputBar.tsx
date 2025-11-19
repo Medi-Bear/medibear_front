@@ -1,32 +1,30 @@
 import React, { useState, useRef, useEffect } from "react";
-import { Send, Plus } from "lucide-react"; // ★ Plus 추가 (아이콘 통일)
+import { Send, Plus } from "lucide-react";
 import { flushSync } from "react-dom";
 
 type Props = {
   onSend: (text: string) => void;
+  onReport: (type: "daily" | "weekly") => Promise<void>;
 };
 
-export default function ChatInputBar({ onSend }: Props) {
+export default function ChatInputBar({ onSend, onReport }: Props) {
   const [text, setText] = useState("");
   const [sending, setSending] = useState(false);
   const [isComposing, setIsComposing] = useState(false);
 
   const textareaRef = useRef<HTMLTextAreaElement>(null);
 
-  // 자동 높이 조절
   useEffect(() => {
     if (!textareaRef.current) return;
     textareaRef.current.style.height = "auto";
     textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
   }, [text]);
 
-  // 전송
   const handleSend = async () => {
     const trimmed = text.trim();
     if (!trimmed) return;
 
     setSending(true);
-
     flushSync(() => setText(""));
 
     await onSend(trimmed);
@@ -34,43 +32,49 @@ export default function ChatInputBar({ onSend }: Props) {
     setSending(false);
   };
 
-  // Enter 처리
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
-    if (isComposing) return;
-    if (e.key === "Enter" && !e.shiftKey) {
-      e.preventDefault();
-      handleSend();
+  // 🔥 dropdown 닫기 함수
+  const closeDropdown = () => {
+    if (document.activeElement instanceof HTMLElement) {
+      document.activeElement.blur(); // DaisyUI dropdown 자동 닫힘
     }
   };
 
   return (
     <div className="w-full max-w-[1027px] mx-auto px-4 pb-4">
-      <div
-        className="
-          relative flex items-center gap-3
-          bg-white border border-gray-300 px-4 py-3 rounded-full
-        "
-      >
-        {/* + 버튼 (첫 번째 컴포넌트 UI와 동일 스타일) */}
+      <div className="relative flex items-center gap-3 bg-white border border-gray-300 px-4 py-3 rounded-full">
+
+        {/* + 버튼 */}
         <div className="dropdown dropdown-top">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-ghost btn-sm rounded-full"
-          >
+          <div tabIndex={0} role="button" className="btn btn-ghost btn-sm rounded-full">
             <Plus size={20} />
           </div>
 
-          <ul
-            tabIndex={-1}
-            className="dropdown-content menu bg-base-100 rounded-box w-40 p-2 shadow"
-          >
+          <ul tabIndex={-1} className="dropdown-content menu bg-base-100 rounded-box w-40 p-2 shadow">
+
+            {/* 일간 리포트 */}
             <li>
-              <a>📁 기능 1</a>
+              <button
+                onClick={() => {
+                  onReport("daily");
+                  closeDropdown(); // 🔥 클릭 후 드롭다운 닫힘
+                }}
+              >
+                📅 일간 리포트
+              </button>
             </li>
+
+            {/* 주간 리포트 */}
             <li>
-              <a>📄 기능 2</a>
+              <button
+                onClick={() => {
+                  onReport("weekly");
+                  closeDropdown(); // 🔥 클릭 후 드롭다운 닫힘
+                }}
+              >
+                📊 주간 리포트
+              </button>
             </li>
+
           </ul>
         </div>
 
@@ -82,23 +86,22 @@ export default function ChatInputBar({ onSend }: Props) {
           onChange={(e) => setText(e.target.value)}
           onCompositionStart={() => setIsComposing(true)}
           onCompositionEnd={() => setIsComposing(false)}
-          onKeyDown={handleKeyDown}
+          onKeyDown={(e) => {
+            if (isComposing) return;
+            if (e.key === "Enter" && !e.shiftKey) {
+              e.preventDefault();
+              handleSend();
+            }
+          }}
           rows={1}
-          className="
-            flex-1 bg-transparent resize-none 
-            focus:outline-none text-[15px] leading-[1.5]
-            max-h-[160px] overflow-y-auto
-          "
+          className="flex-1 bg-transparent resize-none focus:outline-none text-[15px] leading-[1.5] max-h-[160px] overflow-y-auto"
         />
 
-        {/* 전송 버튼 (첫 번째 컴포넌트 스타일 적용) */}
+        {/* 전송 버튼 */}
         <button
           onClick={handleSend}
           disabled={sending}
-          className="
-            btn btn-circle btn-sm bg-primary text-white border-none
-            hover:bg-primary/80
-          "
+          className="btn btn-circle btn-sm bg-primary text-white border-none hover:bg-primary/80"
         >
           <Send size={18} />
         </button>
