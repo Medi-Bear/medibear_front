@@ -26,7 +26,7 @@ async function sendToServer({ text, base64Image, base64Video }: SendArgs) {
   if (base64Video) payload.video = base64Video;
 
   
-  // // 서버에 post 요청
+  // // 서버에 post 요청 
   // const res = await fetch(API_URL, {
   //   method: "POST",
   //   headers: { "Content-Type": "application/json" },
@@ -44,12 +44,21 @@ async function sendToServer({ text, base64Image, base64Video }: SendArgs) {
     });
 
   // 서버 응답 처리
-  const body = await res.text();
-  let json: any;
-  try { json = JSON.parse(body); } catch { json = { raw: body }; }
+  // const body = await res.text();
+  // let json: any;
+  // try { json = JSON.parse(body); } catch { json = { raw: body }; }
 
-  if (!res.ok) throw new Error(json?.detail ?? `HTTP ${res.status}`);
+  // if (!res.ok) throw new Error(json?.detail ?? `HTTP ${res.status}`);
+  // return json;
+  // 서버 응답 처리 (Axios 버전)
+  const json = res.data;   // Axios는 자동 JSON 파싱
+
+  if (res.status < 200 || res.status >= 300) {
+    throw new Error(json?.detail ?? `HTTP ${res.status}`);
+  }
+
   return json;
+
 }
 
 // 메인 컴포넌트 : React 화면을 그리는 컴포넌트
