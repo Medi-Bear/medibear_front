@@ -14,10 +14,10 @@ interface Props {
 }
 
 export default function MessageList({ messages, bottomRef, loading, logo }: Props) {
-  // 🔥 스크롤 컨테이너 ref (overflow-y-auto가 적용된 div)
+  // 스크롤 컨테이너 ref (overflow-y-auto가 적용된 div)
   const scrollContainerRef = useRef<HTMLDivElement>(null);
 
-  // 🔥 현재 스크롤이 아래에 있는지 판단
+  // 현재 스크롤이 아래에 있는지 판단
   const isAtBottom = () => {
     const el = scrollContainerRef.current;
     if (!el) return true;
@@ -58,10 +58,10 @@ export default function MessageList({ messages, bottomRef, loading, logo }: Prop
             text={msg.content}
             isLast={isLastAssistant}
 
-            // 🔥 autoScroll 여부 전달 (맨 아래에 있을 때만 true)
+            // autoScroll 여부 전달 (맨 아래에 있을 때만 true)
             autoScroll={isAtBottom()}
 
-            // 🔥 스크롤 목표 ref 전달
+            // 스크롤 목표 ref 전달
             scrollRef={bottomRef}
           />
         );
